@@ -35,8 +35,27 @@ gcc --version
 2. Download the relevant OS
 3. Proceed with installation 
 
-
 ### Extensions
 You will need the following extensions:
 
-### Creating your first C program
+## Creating and running your first C program
+1. Create a new file called `hello.c` with the following code
+```
+#include <stdio.h>
+
+int main() {
+   printf("Hello, world!");
+   return 0;
+}
+```
+2. Open the terminal in VSCode and run the following command to compile the c code
+```
+gcc hello.c -o hello
+```
+3. An exe called `hello.exe` should now be in your folder. Run the exe file using the following commad:
+```
+./hello
+```
+4. Your output should be as follows:
+<img width="473" alt="VScodeTerminalC" src="https://user-images.githubusercontent.com/15980541/228214933-07913e79-d6a1-4200-9279-f1494ff2860c.PNG">
+
