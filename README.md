@@ -1,6 +1,6 @@
 # EEE2046Pracs
 
-## Windows C-programming
+## Windows C Setup
 This tutorial is based on the video: https://youtu.be/oaebkkOP2Qg
 
 ### Download and extract MinGW
@@ -29,6 +29,13 @@ gcc --version
 3. You should see something like this:
 <img width="435" alt="gccVersion" src="https://user-images.githubusercontent.com/15980541/228206129-94ef09df-2c4a-4442-8f3c-c5eb86b022e7.PNG">
 
+## macOS C Setup
+1. Open Terminal by clicking on the magnifying glass icon in the top right corner of the screen and typing "Terminal" in the search bar.
+2. In the Terminal window, type the following command:
+```
+xcode-select --install
+```
+3. You will be prompted to install the Command Line Tools. Click "Install" and follow the prompts to complete the installation.
 
 ## Visual Studio Code Download
 1. Navigate to https://code.visualstudio.com/download
@@ -36,7 +43,14 @@ gcc --version
 3. Proceed with installation 
 
 ### Extensions
-You will need the following extensions:
+You will need to install the following extensions:
+
+<img width="230" alt="cExtension" src="https://user-images.githubusercontent.com/15980541/228511715-be3d3d37-8aaa-47f2-94d3-fef9f2dd9b9b.PNG">
+
+1. Click on the Extensions icon on the left-hand side of the VSCode window (it looks like a square with four squares inside it).
+2. In the search bar at the top of the Extensions panel, type "C/C++" and press Enter.
+3. Click on the "C/C++" extension from Microsoft.
+4. Click the green "Install" button.
 
 ## Creating and running your first C program
 1. Create a new file called `hello.c` with the following code
@@ -59,6 +73,6 @@ gcc hello.c -o hello
 4. Your output should be as follows:
 <img width="473" alt="VScodeTerminalC" src="https://user-images.githubusercontent.com/15980541/228214933-07913e79-d6a1-4200-9279-f1494ff2860c.PNG">
 
-##C-programming with the STM32
+## C-programming with the STM32
 
 TODO
