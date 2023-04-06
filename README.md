@@ -1,6 +1,6 @@
 # EEE2046Pracs
 
-## Windows C Setup
+## [Visual Studio C setup](https://youtu.be/oaebkkOP2Qg)
 This tutorial is based on the video: https://youtu.be/oaebkkOP2Qg
 
 ### Download and extract MinGW
