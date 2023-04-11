@@ -1,0 +1,1597 @@
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 1
+
+
+   1              		.cpu cortex-m0
+   2              		.arch armv6s-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/main.c"
+  18              		.section	.text.delay,"ax",%progbits
+  19              		.align	1
+  20              		.global	delay
+  21              		.syntax unified
+  22              		.code	16
+  23              		.thumb_func
+  25              	delay:
+  26              	.LVL0:
+  27              	.LFB45:
+  28              		.file 2 "Core/Inc/lcd_stm32f0.c"
+   1:Core/Inc/lcd_stm32f0.c **** //********************************************************************
+   2:Core/Inc/lcd_stm32f0.c **** //*                      EEE2046F STM32F0                            *
+   3:Core/Inc/lcd_stm32f0.c **** //*                         LCD MODULE                               *
+   4:Core/Inc/lcd_stm32f0.c **** //*==================================================================*
+   5:Core/Inc/lcd_stm32f0.c **** //* WRITTEN BY:    Copyright (C) Samuel Ginsberg 2004                *
+   6:Core/Inc/lcd_stm32f0.c **** //* PORTED TO STM32F0 dev board by James Gowans, 2014                *
+   7:Core/Inc/lcd_stm32f0.c **** //* MODIFIED BY:   Robyn Verrinder                                   *
+   8:Core/Inc/lcd_stm32f0.c **** //* DATE CREATED:  2004                                              *
+   9:Core/Inc/lcd_stm32f0.c **** //* PORTED:	   2014						     *
+  10:Core/Inc/lcd_stm32f0.c **** //* MODIFIED:      03-08-2015                                        *
+  11:Core/Inc/lcd_stm32f0.c **** //*==================================================================*
+  12:Core/Inc/lcd_stm32f0.c **** //* PROGRAMMED IN: ECLIPSE IDE Luna Service Release 1 (4.4.1)        *
+  13:Core/Inc/lcd_stm32f0.c **** //* DEV. BOARD:    UCT STM32 Development Board                       *
+  14:Core/Inc/lcd_stm32f0.c **** //* TARGET:	   STMicroelectronics STM32F051C6                    *
+  15:Core/Inc/lcd_stm32f0.c **** //*==================================================================*
+  16:Core/Inc/lcd_stm32f0.c **** //* DESCRIPTION:   This code contains common functions to communicate*
+  17:Core/Inc/lcd_stm32f0.c **** //*                with the LCD module connected to the STM32 uC.    *
+  18:Core/Inc/lcd_stm32f0.c **** //*==================================================================*
+  19:Core/Inc/lcd_stm32f0.c **** //* LCD SETUP:     - 4 bit mode      (Upper 4 data lines D4-D7 used) *
+  20:Core/Inc/lcd_stm32f0.c **** //*                - Two lines used                                  *
+  21:Core/Inc/lcd_stm32f0.c **** //*                - Flashing cursor                                 *
+  22:Core/Inc/lcd_stm32f0.c **** //*==================================================================*
+  23:Core/Inc/lcd_stm32f0.c **** //* CONNECTIONS:                                                     *
+  24:Core/Inc/lcd_stm32f0.c **** //*------------------------------------------------------------------*
+  25:Core/Inc/lcd_stm32f0.c **** //* LCD PINS   | NAME                    | CONNECTED TO              *
+  26:Core/Inc/lcd_stm32f0.c **** //*------------------------------------------------------------------*
+  27:Core/Inc/lcd_stm32f0.c **** //* 1............VSS.......................GND                       *
+  28:Core/Inc/lcd_stm32f0.c **** //* 2............VDD.......................+5V                       *
+  29:Core/Inc/lcd_stm32f0.c **** //* 3............CONTRAST..................POT 2                     *
+  30:Core/Inc/lcd_stm32f0.c **** //* 4............RS  - Register Select.....PC14 (LCD_RS)             *
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 2
+
+
+  31:Core/Inc/lcd_stm32f0.c **** //* 5............RW  - Read/Write..........GND                       *
+  32:Core/Inc/lcd_stm32f0.c **** //* 6............E   - Enable..............PC15 (LCD_E)              *
+  33:Core/Inc/lcd_stm32f0.c **** //* 7............D0  - Data line 0.........GND                       *
+  34:Core/Inc/lcd_stm32f0.c **** //* 8............D1  - Data line 1.........GND                       *
+  35:Core/Inc/lcd_stm32f0.c **** //* 9............D2  - Data line 2.........GND                       *
+  36:Core/Inc/lcd_stm32f0.c **** //* 10...........D3  - Data line 3.........GND                       *
+  37:Core/Inc/lcd_stm32f0.c **** //* 11...........D4  - Data line 4.........PB8  (LCD_D4)             *
+  38:Core/Inc/lcd_stm32f0.c **** //* 12...........D5  - Data line 5.........PB9  (LCD_D5)             *
+  39:Core/Inc/lcd_stm32f0.c **** //* 13...........D6  - Data line 6.........PA12 (LCD_D6)             *
+  40:Core/Inc/lcd_stm32f0.c **** //* 14...........D7  - Data line 7.........PA15 (LCD_D7)             *
+  41:Core/Inc/lcd_stm32f0.c **** //* 15...........CATHLED...................NC                        *
+  42:Core/Inc/lcd_stm32f0.c **** //* 16...........ANODELED..................NC                        *
+  43:Core/Inc/lcd_stm32f0.c **** //********************************************************************
+  44:Core/Inc/lcd_stm32f0.c **** // INCLUDE FILES
+  45:Core/Inc/lcd_stm32f0.c **** //====================================================================
+  46:Core/Inc/lcd_stm32f0.c **** #include "lcd_stm32f0.h"
+  47:Core/Inc/lcd_stm32f0.c **** #include "stm32f0xx.h"
+  48:Core/Inc/lcd_stm32f0.c **** //====================================================================
+  49:Core/Inc/lcd_stm32f0.c **** // SEND COMMAND CODE TO LCD - LCD_Command(command)
+  50:Core/Inc/lcd_stm32f0.c **** //====================================================================
+  51:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: This function sends a command to the LCD. Care is taken
+  52:Core/Inc/lcd_stm32f0.c **** //              not to interfere with the other lines on the port.
+  53:Core/Inc/lcd_stm32f0.c **** //
+  54:Core/Inc/lcd_stm32f0.c **** //              As we are using a microcontroller to control the LCD
+  55:Core/Inc/lcd_stm32f0.c **** //              we use 4-bit mode to save on number of lines used to
+  56:Core/Inc/lcd_stm32f0.c **** //              connect to the LCD. This means that an 8-bit command
+  57:Core/Inc/lcd_stm32f0.c **** //              must be split into two sets of 4-bits (upper and lower)
+  58:Core/Inc/lcd_stm32f0.c **** //              These sets must be transmitted
+  59:Core/Inc/lcd_stm32f0.c **** //====================================================================
+  60:Core/Inc/lcd_stm32f0.c **** // USEFUL COMMANDS:
+  61:Core/Inc/lcd_stm32f0.c **** //                  - POWER_UP:      Power up initialization for the lcd
+  62:Core/Inc/lcd_stm32f0.c **** //                  - FOURBIT_MODE:  Sets LCD for 4-bit mode
+  63:Core/Inc/lcd_stm32f0.c **** //                  - TWOLINE_MODE:  Sets up 2 lines and character size
+  64:Core/Inc/lcd_stm32f0.c **** //                  - SETUP_CURSOR:  Turn display on and set up cursor
+  65:Core/Inc/lcd_stm32f0.c **** //                  - CLEAR:         Clear screen
+  66:Core/Inc/lcd_stm32f0.c **** //                  - CURSOR_HOME:   Cursor home
+  67:Core/Inc/lcd_stm32f0.c **** //                  - LINE_TWO:      Line 2
+  68:Core/Inc/lcd_stm32f0.c **** //
+  69:Core/Inc/lcd_stm32f0.c **** //====================================================================
+  70:Core/Inc/lcd_stm32f0.c **** 
+  71:Core/Inc/lcd_stm32f0.c **** void lcd_command(unsigned char command)
+  72:Core/Inc/lcd_stm32f0.c **** {
+  73:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_RS_RESET;	// Register Select (RS)line low (data sent will now be read as com
+  74:Core/Inc/lcd_stm32f0.c **** 
+  75:Core/Inc/lcd_stm32f0.c **** // Put upper nibble (upper 4-bits) on data lines, command mode
+  76:Core/Inc/lcd_stm32f0.c **** // DATALINE 7
+  77:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x80) != 0)		// Select bit 7 of command, if HIGH set Data line 7 (D7) 
+  78:Core/Inc/lcd_stm32f0.c ****     {
+  79:Core/Inc/lcd_stm32f0.c ****     	GPIOA->BSRR |= LCD_D7_SET;
+  80:Core/Inc/lcd_stm32f0.c ****     }
+  81:Core/Inc/lcd_stm32f0.c ****     else				// else RESET D7
+  82:Core/Inc/lcd_stm32f0.c ****     {
+  83:Core/Inc/lcd_stm32f0.c ****     	GPIOA->BSRR |= LCD_D7_RESET;
+  84:Core/Inc/lcd_stm32f0.c ****     }
+  85:Core/Inc/lcd_stm32f0.c **** // DATALINE 6
+  86:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x40) != 0)		// Select bit 6 of command, if HIGH set Data line 6 (D6) 
+  87:Core/Inc/lcd_stm32f0.c ****     {
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 3
+
+
+  88:Core/Inc/lcd_stm32f0.c ****         GPIOA->BSRR |= LCD_D6_SET;
+  89:Core/Inc/lcd_stm32f0.c ****     }
+  90:Core/Inc/lcd_stm32f0.c ****     else				// else RESET D6
+  91:Core/Inc/lcd_stm32f0.c ****     {
+  92:Core/Inc/lcd_stm32f0.c ****         GPIOA->BSRR |= LCD_D6_RESET;
+  93:Core/Inc/lcd_stm32f0.c ****     }
+  94:Core/Inc/lcd_stm32f0.c **** // DATALINE 5
+  95:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x20) != 0)		// Select bit 5 of command, if HIGH set Data line 5 (D5)
+  96:Core/Inc/lcd_stm32f0.c ****     {
+  97:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D5_SET;	
+  98:Core/Inc/lcd_stm32f0.c ****     }
+  99:Core/Inc/lcd_stm32f0.c ****     else				// else RESET D5
+ 100:Core/Inc/lcd_stm32f0.c ****     {
+ 101:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D5_RESET;
+ 102:Core/Inc/lcd_stm32f0.c ****     }
+ 103:Core/Inc/lcd_stm32f0.c **** // DATALINE 4
+ 104:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x10) != 0)		// Select bit 4 of command, if HIGH set Data line 4 (D4)
+ 105:Core/Inc/lcd_stm32f0.c ****     {
+ 106:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D4_SET;
+ 107:Core/Inc/lcd_stm32f0.c ****     }
+ 108:Core/Inc/lcd_stm32f0.c ****     else				//  else RESET D4
+ 109:Core/Inc/lcd_stm32f0.c ****     {
+ 110:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D4_RESET;
+ 111:Core/Inc/lcd_stm32f0.c ****     }
+ 112:Core/Inc/lcd_stm32f0.c **** 
+ 113:Core/Inc/lcd_stm32f0.c ****     pulse_strobe ();			// Send data
+ 114:Core/Inc/lcd_stm32f0.c **** 
+ 115:Core/Inc/lcd_stm32f0.c **** // lower nibble to data lines
+ 116:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x08) != 0)		// Select bit 3 of command, if HIGH set Data line 7 (D7) 
+ 117:Core/Inc/lcd_stm32f0.c ****     {
+ 118:Core/Inc/lcd_stm32f0.c ****     	GPIOA->BSRR |= LCD_D7_SET;
+ 119:Core/Inc/lcd_stm32f0.c ****     }
+ 120:Core/Inc/lcd_stm32f0.c ****     else				// else RESET D7
+ 121:Core/Inc/lcd_stm32f0.c ****     {
+ 122:Core/Inc/lcd_stm32f0.c ****     	GPIOA->BSRR |= LCD_D7_RESET;
+ 123:Core/Inc/lcd_stm32f0.c ****     }
+ 124:Core/Inc/lcd_stm32f0.c **** // DATALINE 6
+ 125:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x04) != 0)		// Select bit 2 of command, if HIGH set Data line 6 (D6)
+ 126:Core/Inc/lcd_stm32f0.c ****     {
+ 127:Core/Inc/lcd_stm32f0.c ****         GPIOA->BSRR |= LCD_D6_SET;
+ 128:Core/Inc/lcd_stm32f0.c ****     }
+ 129:Core/Inc/lcd_stm32f0.c ****     else				//  else RESET D6
+ 130:Core/Inc/lcd_stm32f0.c ****     {
+ 131:Core/Inc/lcd_stm32f0.c ****         GPIOA->BSRR |= LCD_D6_RESET;
+ 132:Core/Inc/lcd_stm32f0.c ****     }
+ 133:Core/Inc/lcd_stm32f0.c ****     // DATALINE 5
+ 134:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x02) != 0)		// Select bit 1 of command, if HIGH set Data line 5 (D5)
+ 135:Core/Inc/lcd_stm32f0.c ****     {
+ 136:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D5_SET;         
+ 137:Core/Inc/lcd_stm32f0.c ****     }
+ 138:Core/Inc/lcd_stm32f0.c ****     else				//  else RESET D5
+ 139:Core/Inc/lcd_stm32f0.c ****     {
+ 140:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D5_RESET;
+ 141:Core/Inc/lcd_stm32f0.c ****     }
+ 142:Core/Inc/lcd_stm32f0.c ****     // DATALINE 4
+ 143:Core/Inc/lcd_stm32f0.c ****     if ((command & 0x01) != 0)		// Select bit 0 of command, if HIGH set Data line 4 (D4)
+ 144:Core/Inc/lcd_stm32f0.c ****     {
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 4
+
+
+ 145:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D4_SET;
+ 146:Core/Inc/lcd_stm32f0.c ****     }
+ 147:Core/Inc/lcd_stm32f0.c ****     else				//  else RESET D4
+ 148:Core/Inc/lcd_stm32f0.c ****     {
+ 149:Core/Inc/lcd_stm32f0.c ****     	GPIOB->BSRR |= LCD_D4_RESET;
+ 150:Core/Inc/lcd_stm32f0.c ****     }
+ 151:Core/Inc/lcd_stm32f0.c **** 
+ 152:Core/Inc/lcd_stm32f0.c ****     pulse_strobe();			// Send data
+ 153:Core/Inc/lcd_stm32f0.c ****     delay(3000);
+ 154:Core/Inc/lcd_stm32f0.c **** }
+ 155:Core/Inc/lcd_stm32f0.c **** 
+ 156:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 157:Core/Inc/lcd_stm32f0.c **** // INITIALISE LCD - LCD_Init()
+ 158:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 159:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: This function sets up the port lines for the LCD and
+ 160:Core/Inc/lcd_stm32f0.c **** //              intialises the module for use.
+ 161:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 162:Core/Inc/lcd_stm32f0.c **** // LCD SETUP:     - 4 bit mode      (Upper 4 data lines D4-D7 used)
+ 163:Core/Inc/lcd_stm32f0.c **** //                - Two lines used
+ 164:Core/Inc/lcd_stm32f0.c **** //                - Flashing cursor
+ 165:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 166:Core/Inc/lcd_stm32f0.c **** 
+ 167:Core/Inc/lcd_stm32f0.c **** void init_LCD(void)
+ 168:Core/Inc/lcd_stm32f0.c **** {
+ 169:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;	// Connect clocks to GPIO A, B and C
+ 170:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+ 171:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+ 172:Core/Inc/lcd_stm32f0.c **** 
+ 173:Core/Inc/lcd_stm32f0.c ****     GPIOA->MODER |= (GPIO_MODER_MODER12_0|GPIO_MODER_MODER15_0); // D6 and D7
+ 174:Core/Inc/lcd_stm32f0.c ****     GPIOB->MODER |= (GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0);   // D4 and D5
+ 175:Core/Inc/lcd_stm32f0.c ****     GPIOC->MODER |= (GPIO_MODER_MODER14_0|GPIO_MODER_MODER15_0); // RS and EN
+ 176:Core/Inc/lcd_stm32f0.c **** 
+ 177:Core/Inc/lcd_stm32f0.c ****     delay(30000);			// Allow the LCD some power up time (~30ms)
+ 178:Core/Inc/lcd_stm32f0.c **** 
+ 179:Core/Inc/lcd_stm32f0.c ****     lcd_command(POWER_UP);		// Power up initialization for the lcd
+ 180:Core/Inc/lcd_stm32f0.c ****     lcd_command(FOURBIT_MODE);		// Set LCD into 4 bit mode
+ 181:Core/Inc/lcd_stm32f0.c ****     lcd_command(DISPLAY_ON);		// Turn display on and set up cursor
+ 182:Core/Inc/lcd_stm32f0.c ****     lcd_command(TWOLINE_MODE);		// Set up 2 lines and character size
+ 183:Core/Inc/lcd_stm32f0.c ****     lcd_command(CLEAR);			// Clear display
+ 184:Core/Inc/lcd_stm32f0.c **** }
+ 185:Core/Inc/lcd_stm32f0.c **** 
+ 186:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 187:Core/Inc/lcd_stm32f0.c **** // WRITE A SINGLE CHARACTER TO THE LCD - LCD_PutChar(character)
+ 188:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 189:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: Puts a single character on the LCD at the next position
+ 190:Core/Inc/lcd_stm32f0.c **** //              on the screen. The character to be printed is in the input
+ 191:Core/Inc/lcd_stm32f0.c **** //              parameter. For numbers, letters and other common characters
+ 192:Core/Inc/lcd_stm32f0.c **** //              the ASCII code will produce correct display.
+ 193:Core/Inc/lcd_stm32f0.c **** //
+ 194:Core/Inc/lcd_stm32f0.c **** //              Refer to the Hitachi HD44780 datasheet for full character
+ 195:Core/Inc/lcd_stm32f0.c **** //              set information.
+ 196:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 197:Core/Inc/lcd_stm32f0.c **** 
+ 198:Core/Inc/lcd_stm32f0.c ****  void lcd_putchar(unsigned char character)
+ 199:Core/Inc/lcd_stm32f0.c **** {
+ 200:Core/Inc/lcd_stm32f0.c **** 	GPIOC->BSRR |= LCD_RS_SET;	// Register Select (RS) line HIGH (data sent will now be read as text);
+ 201:Core/Inc/lcd_stm32f0.c **** // Put upper nibble (upper 4-bits) on data lines, command mode
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 5
+
+
+ 202:Core/Inc/lcd_stm32f0.c **** // DATALINE 7
+ 203:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x80) != 0) 	// Select bit 7 of command, if HIGH set Data line 7 (D7)
+ 204:Core/Inc/lcd_stm32f0.c ****         {
+ 205:Core/Inc/lcd_stm32f0.c ****         	GPIOA->BSRR |= LCD_D7_SET;
+ 206:Core/Inc/lcd_stm32f0.c ****         }
+ 207:Core/Inc/lcd_stm32f0.c ****         else				//  else RESET D7
+ 208:Core/Inc/lcd_stm32f0.c ****         {
+ 209:Core/Inc/lcd_stm32f0.c ****         	GPIOA->BSRR |= LCD_D7_RESET;
+ 210:Core/Inc/lcd_stm32f0.c ****         }
+ 211:Core/Inc/lcd_stm32f0.c ****         // DATALINE 6
+ 212:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x40) != 0)	// Select bit 6 of command, if HIGH set Data line 6 (D6)      
+ 213:Core/Inc/lcd_stm32f0.c **** 	{
+ 214:Core/Inc/lcd_stm32f0.c ****             GPIOA->BSRR |= LCD_D6_SET;
+ 215:Core/Inc/lcd_stm32f0.c ****         }
+ 216:Core/Inc/lcd_stm32f0.c ****         else				//  else RESET D6
+ 217:Core/Inc/lcd_stm32f0.c **** 
+ 218:Core/Inc/lcd_stm32f0.c ****         {
+ 219:Core/Inc/lcd_stm32f0.c ****             GPIOA->BSRR |= LCD_D6_RESET;
+ 220:Core/Inc/lcd_stm32f0.c ****         }
+ 221:Core/Inc/lcd_stm32f0.c **** // DATALINE 5
+ 222:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x20) != 0)	// Select bit 5 of command, if HIGH set Data line 5 (D5)
+ 223:Core/Inc/lcd_stm32f0.c **** 
+ 224:Core/Inc/lcd_stm32f0.c ****         {
+ 225:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D5_SET;                 
+ 226:Core/Inc/lcd_stm32f0.c **** 	}
+ 227:Core/Inc/lcd_stm32f0.c ****         else				//  else RESET D5
+ 228:Core/Inc/lcd_stm32f0.c ****         {
+ 229:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D5_RESET;
+ 230:Core/Inc/lcd_stm32f0.c ****         }
+ 231:Core/Inc/lcd_stm32f0.c **** // DATALINE 4
+ 232:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x10) != 0)	// Select bit 4 of command, if HIGH set Data line 4 (D4) 
+ 233:Core/Inc/lcd_stm32f0.c ****         {
+ 234:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D4_SET;
+ 235:Core/Inc/lcd_stm32f0.c ****         }
+ 236:Core/Inc/lcd_stm32f0.c ****         else				// else RESET D4
+ 237:Core/Inc/lcd_stm32f0.c ****         {
+ 238:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D4_RESET;
+ 239:Core/Inc/lcd_stm32f0.c ****         }
+ 240:Core/Inc/lcd_stm32f0.c **** 
+ 241:Core/Inc/lcd_stm32f0.c ****         pulse_strobe ();		// Send data
+ 242:Core/Inc/lcd_stm32f0.c **** 
+ 243:Core/Inc/lcd_stm32f0.c **** // lower nibble to data lines
+ 244:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x08) != 0)	// Select bit 3 of command, if HIGH set Data line 7 (D7) 
+ 245:Core/Inc/lcd_stm32f0.c ****         {
+ 246:Core/Inc/lcd_stm32f0.c ****         	GPIOA->BSRR |= LCD_D7_SET;
+ 247:Core/Inc/lcd_stm32f0.c ****         }
+ 248:Core/Inc/lcd_stm32f0.c ****         else				// else RESET D7
+ 249:Core/Inc/lcd_stm32f0.c ****         {
+ 250:Core/Inc/lcd_stm32f0.c ****         	GPIOA->BSRR |= LCD_D7_RESET;
+ 251:Core/Inc/lcd_stm32f0.c ****         }
+ 252:Core/Inc/lcd_stm32f0.c **** // DATALINE 6
+ 253:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x04) != 0)	// Select bit 2 of command, if HIGH set Data line 6 (D6)      
+ 254:Core/Inc/lcd_stm32f0.c **** 	{
+ 255:Core/Inc/lcd_stm32f0.c ****             GPIOA->BSRR |= LCD_D6_SET;
+ 256:Core/Inc/lcd_stm32f0.c ****         }
+ 257:Core/Inc/lcd_stm32f0.c ****         else				// else RESET D6
+ 258:Core/Inc/lcd_stm32f0.c **** 
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 6
+
+
+ 259:Core/Inc/lcd_stm32f0.c ****         {
+ 260:Core/Inc/lcd_stm32f0.c ****             GPIOA->BSRR |= LCD_D6_RESET;
+ 261:Core/Inc/lcd_stm32f0.c ****         }
+ 262:Core/Inc/lcd_stm32f0.c **** // DATALINE 5
+ 263:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x02) != 0)	// Select bit 1 of command, if HIGH set Data line 5 (D5)  
+ 264:Core/Inc/lcd_stm32f0.c ****         {
+ 265:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D5_SET;       
+ 266:Core/Inc/lcd_stm32f0.c **** 	}
+ 267:Core/Inc/lcd_stm32f0.c ****         else				// else RESET D5
+ 268:Core/Inc/lcd_stm32f0.c ****         {
+ 269:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D5_RESET;
+ 270:Core/Inc/lcd_stm32f0.c ****         }
+ 271:Core/Inc/lcd_stm32f0.c **** // DATALINE 4
+ 272:Core/Inc/lcd_stm32f0.c ****         if ((character & 0x01) != 0)	// Select bit 0 of command, if HIGH set Data line 4 (D4)
+ 273:Core/Inc/lcd_stm32f0.c ****         {
+ 274:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D4_SET;
+ 275:Core/Inc/lcd_stm32f0.c ****         }
+ 276:Core/Inc/lcd_stm32f0.c ****         else				//  else RESET D4
+ 277:Core/Inc/lcd_stm32f0.c ****         {
+ 278:Core/Inc/lcd_stm32f0.c ****         	GPIOB->BSRR |= LCD_D4_RESET;
+ 279:Core/Inc/lcd_stm32f0.c ****         }
+ 280:Core/Inc/lcd_stm32f0.c **** 
+ 281:Core/Inc/lcd_stm32f0.c ****         pulse_strobe();			// Send data
+ 282:Core/Inc/lcd_stm32f0.c **** }
+ 283:Core/Inc/lcd_stm32f0.c **** 
+ 284:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 285:Core/Inc/lcd_stm32f0.c **** // WRITE A STRING TO THE LCD - LCD_PutString(ptr_String)
+ 286:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 287:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: Writes a string to the LCD
+ 288:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 289:Core/Inc/lcd_stm32f0.c **** 
+ 290:Core/Inc/lcd_stm32f0.c **** void lcd_putstring(char *instring)
+ 291:Core/Inc/lcd_stm32f0.c **** {
+ 292:Core/Inc/lcd_stm32f0.c ****     unsigned char count = 0;
+ 293:Core/Inc/lcd_stm32f0.c **** 
+ 294:Core/Inc/lcd_stm32f0.c ****     while (instring[count])		// Until the null terminator is reached
+ 295:Core/Inc/lcd_stm32f0.c ****     {
+ 296:Core/Inc/lcd_stm32f0.c ****     	lcd_putchar(instring[count]);	// Write each character to LCD
+ 297:Core/Inc/lcd_stm32f0.c **** 	    count++;
+ 298:Core/Inc/lcd_stm32f0.c **** 	 }
+ 299:Core/Inc/lcd_stm32f0.c **** }
+ 300:Core/Inc/lcd_stm32f0.c **** 
+ 301:Core/Inc/lcd_stm32f0.c **** 
+ 302:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 303:Core/Inc/lcd_stm32f0.c **** // PULSE STROBE - Pulse_Strobe()
+ 304:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 305:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: Pulse the strobe line of the LCD to indicate that data is ready.
+ 306:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 307:Core/Inc/lcd_stm32f0.c **** 
+ 308:Core/Inc/lcd_stm32f0.c **** void pulse_strobe(void)
+ 309:Core/Inc/lcd_stm32f0.c **** {
+ 310:Core/Inc/lcd_stm32f0.c ****     delay(20);				// Delay
+ 311:Core/Inc/lcd_stm32f0.c **** 
+ 312:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_EN_SET;		// pull E (PC15) HIGH
+ 313:Core/Inc/lcd_stm32f0.c **** 
+ 314:Core/Inc/lcd_stm32f0.c ****     delay(20);				// Delay
+ 315:Core/Inc/lcd_stm32f0.c **** 
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 7
+
+
+ 316:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_EN_RESET;	// Take EN LOW
+ 317:Core/Inc/lcd_stm32f0.c **** 
+ 318:Core/Inc/lcd_stm32f0.c ****     delay(20);				// Delay
+ 319:Core/Inc/lcd_stm32f0.c **** 
+ 320:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_EN_SET;		// Take EN HIGH
+ 321:Core/Inc/lcd_stm32f0.c **** }
+ 322:Core/Inc/lcd_stm32f0.c **** 
+ 323:Core/Inc/lcd_stm32f0.c **** 
+ 324:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 325:Core/Inc/lcd_stm32f0.c **** // LOOP DELAY - delay(microseconds)
+ 326:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 327:Core/Inc/lcd_stm32f0.c **** // DESCRIPTION: A delay used by the LCD functions.
+ 328:Core/Inc/lcd_stm32f0.c **** //====================================================================
+ 329:Core/Inc/lcd_stm32f0.c **** 
+ 330:Core/Inc/lcd_stm32f0.c **** void delay(unsigned int microseconds)
+ 331:Core/Inc/lcd_stm32f0.c **** {
+  29              		.loc 2 331 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 2 331 1 is_stmt 0 view .LVU1
+  35 0000 82B0     		sub	sp, sp, #8
+  36              		.cfi_def_cfa_offset 8
+ 332:Core/Inc/lcd_stm32f0.c **** 	  volatile unsigned int counter;
+  37              		.loc 2 332 4 is_stmt 1 view .LVU2
+ 333:Core/Inc/lcd_stm32f0.c **** 	  microseconds *= 3;
+  38              		.loc 2 333 4 view .LVU3
+  39              		.loc 2 333 17 is_stmt 0 view .LVU4
+  40 0002 4300     		lsls	r3, r0, #1
+  41 0004 1818     		adds	r0, r3, r0
+  42              	.LVL1:
+ 334:Core/Inc/lcd_stm32f0.c **** 	  for(counter = 0; counter<microseconds; counter++)
+  43              		.loc 2 334 4 is_stmt 1 view .LVU5
+  44              		.loc 2 334 16 is_stmt 0 view .LVU6
+  45 0006 0023     		movs	r3, #0
+  46 0008 0193     		str	r3, [sp, #4]
+  47              		.loc 2 334 4 view .LVU7
+  48 000a 04E0     		b	.L2
+  49              	.L3:
+ 335:Core/Inc/lcd_stm32f0.c **** 	  {
+ 336:Core/Inc/lcd_stm32f0.c **** 	    __asm("nop");
+  50              		.loc 2 336 6 is_stmt 1 discriminator 3 view .LVU8
+  51              		.syntax divided
+  52              	@ 336 "Core/Inc/lcd_stm32f0.c" 1
+  53 000c C046     		nop
+  54              	@ 0 "" 2
+ 337:Core/Inc/lcd_stm32f0.c **** 	    __asm("nop");
+  55              		.loc 2 337 6 discriminator 3 view .LVU9
+  56              	@ 337 "Core/Inc/lcd_stm32f0.c" 1
+  57 000e C046     		nop
+  58              	@ 0 "" 2
+ 334:Core/Inc/lcd_stm32f0.c **** 	  for(counter = 0; counter<microseconds; counter++)
+  59              		.loc 2 334 50 discriminator 3 view .LVU10
+  60              		.thumb
+  61              		.syntax unified
+  62 0010 019B     		ldr	r3, [sp, #4]
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 8
+
+
+  63 0012 0133     		adds	r3, r3, #1
+  64 0014 0193     		str	r3, [sp, #4]
+  65              	.L2:
+ 334:Core/Inc/lcd_stm32f0.c **** 	  for(counter = 0; counter<microseconds; counter++)
+  66              		.loc 2 334 28 discriminator 1 view .LVU11
+  67 0016 019B     		ldr	r3, [sp, #4]
+  68 0018 8342     		cmp	r3, r0
+  69 001a F7D3     		bcc	.L3
+ 338:Core/Inc/lcd_stm32f0.c **** 	  }
+ 339:Core/Inc/lcd_stm32f0.c **** }
+  70              		.loc 2 339 1 is_stmt 0 view .LVU12
+  71 001c 02B0     		add	sp, sp, #8
+  72              		@ sp needed
+  73 001e 7047     		bx	lr
+  74              		.cfi_endproc
+  75              	.LFE45:
+  77              		.section	.text.pulse_strobe,"ax",%progbits
+  78              		.align	1
+  79              		.global	pulse_strobe
+  80              		.syntax unified
+  81              		.code	16
+  82              		.thumb_func
+  84              	pulse_strobe:
+  85              	.LFB44:
+ 309:Core/Inc/lcd_stm32f0.c ****     delay(20);				// Delay
+  86              		.loc 2 309 1 is_stmt 1 view -0
+  87              		.cfi_startproc
+  88              		@ args = 0, pretend = 0, frame = 0
+  89              		@ frame_needed = 0, uses_anonymous_args = 0
+  90 0000 70B5     		push	{r4, r5, r6, lr}
+  91              		.cfi_def_cfa_offset 16
+  92              		.cfi_offset 4, -16
+  93              		.cfi_offset 5, -12
+  94              		.cfi_offset 6, -8
+  95              		.cfi_offset 14, -4
+ 310:Core/Inc/lcd_stm32f0.c **** 
+  96              		.loc 2 310 5 view .LVU14
+  97 0002 1420     		movs	r0, #20
+  98 0004 FFF7FEFF 		bl	delay
+  99              	.LVL2:
+ 312:Core/Inc/lcd_stm32f0.c **** 
+ 100              		.loc 2 312 5 view .LVU15
+ 312:Core/Inc/lcd_stm32f0.c **** 
+ 101              		.loc 2 312 10 is_stmt 0 view .LVU16
+ 102 0008 0A4C     		ldr	r4, .L5
+ 103 000a A369     		ldr	r3, [r4, #24]
+ 312:Core/Inc/lcd_stm32f0.c **** 
+ 104              		.loc 2 312 17 view .LVU17
+ 105 000c 8025     		movs	r5, #128
+ 106 000e 2D02     		lsls	r5, r5, #8
+ 107 0010 2B43     		orrs	r3, r5
+ 108 0012 A361     		str	r3, [r4, #24]
+ 314:Core/Inc/lcd_stm32f0.c **** 
+ 109              		.loc 2 314 5 is_stmt 1 view .LVU18
+ 110 0014 1420     		movs	r0, #20
+ 111 0016 FFF7FEFF 		bl	delay
+ 112              	.LVL3:
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 9
+
+
+ 316:Core/Inc/lcd_stm32f0.c **** 
+ 113              		.loc 2 316 5 view .LVU19
+ 316:Core/Inc/lcd_stm32f0.c **** 
+ 114              		.loc 2 316 10 is_stmt 0 view .LVU20
+ 115 001a A269     		ldr	r2, [r4, #24]
+ 316:Core/Inc/lcd_stm32f0.c **** 
+ 116              		.loc 2 316 17 view .LVU21
+ 117 001c 8023     		movs	r3, #128
+ 118 001e 1B06     		lsls	r3, r3, #24
+ 119 0020 1343     		orrs	r3, r2
+ 120 0022 A361     		str	r3, [r4, #24]
+ 318:Core/Inc/lcd_stm32f0.c **** 
+ 121              		.loc 2 318 5 is_stmt 1 view .LVU22
+ 122 0024 1420     		movs	r0, #20
+ 123 0026 FFF7FEFF 		bl	delay
+ 124              	.LVL4:
+ 320:Core/Inc/lcd_stm32f0.c **** }
+ 125              		.loc 2 320 5 view .LVU23
+ 320:Core/Inc/lcd_stm32f0.c **** }
+ 126              		.loc 2 320 10 is_stmt 0 view .LVU24
+ 127 002a A369     		ldr	r3, [r4, #24]
+ 320:Core/Inc/lcd_stm32f0.c **** }
+ 128              		.loc 2 320 17 view .LVU25
+ 129 002c 1D43     		orrs	r5, r3
+ 130 002e A561     		str	r5, [r4, #24]
+ 321:Core/Inc/lcd_stm32f0.c **** 
+ 131              		.loc 2 321 1 view .LVU26
+ 132              		@ sp needed
+ 133 0030 70BD     		pop	{r4, r5, r6, pc}
+ 134              	.L6:
+ 135 0032 C046     		.align	2
+ 136              	.L5:
+ 137 0034 00080048 		.word	1207961600
+ 138              		.cfi_endproc
+ 139              	.LFE44:
+ 141              		.section	.text.lcd_putchar,"ax",%progbits
+ 142              		.align	1
+ 143              		.global	lcd_putchar
+ 144              		.syntax unified
+ 145              		.code	16
+ 146              		.thumb_func
+ 148              	lcd_putchar:
+ 149              	.LVL5:
+ 150              	.LFB42:
+ 199:Core/Inc/lcd_stm32f0.c **** 	GPIOC->BSRR |= LCD_RS_SET;	// Register Select (RS) line HIGH (data sent will now be read as text);
+ 151              		.loc 2 199 1 is_stmt 1 view -0
+ 152              		.cfi_startproc
+ 153              		@ args = 0, pretend = 0, frame = 0
+ 154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199:Core/Inc/lcd_stm32f0.c **** 	GPIOC->BSRR |= LCD_RS_SET;	// Register Select (RS) line HIGH (data sent will now be read as text);
+ 155              		.loc 2 199 1 is_stmt 0 view .LVU28
+ 156 0000 10B5     		push	{r4, lr}
+ 157              		.cfi_def_cfa_offset 8
+ 158              		.cfi_offset 4, -8
+ 159              		.cfi_offset 14, -4
+ 160 0002 0400     		movs	r4, r0
+ 200:Core/Inc/lcd_stm32f0.c **** // Put upper nibble (upper 4-bits) on data lines, command mode
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 10
+
+
+ 161              		.loc 2 200 2 is_stmt 1 view .LVU29
+ 200:Core/Inc/lcd_stm32f0.c **** // Put upper nibble (upper 4-bits) on data lines, command mode
+ 162              		.loc 2 200 7 is_stmt 0 view .LVU30
+ 163 0004 454A     		ldr	r2, .L25
+ 164 0006 9169     		ldr	r1, [r2, #24]
+ 200:Core/Inc/lcd_stm32f0.c **** // Put upper nibble (upper 4-bits) on data lines, command mode
+ 165              		.loc 2 200 14 view .LVU31
+ 166 0008 8023     		movs	r3, #128
+ 167 000a DB01     		lsls	r3, r3, #7
+ 168 000c 0B43     		orrs	r3, r1
+ 169 000e 9361     		str	r3, [r2, #24]
+ 203:Core/Inc/lcd_stm32f0.c ****         {
+ 170              		.loc 2 203 9 is_stmt 1 view .LVU32
+ 203:Core/Inc/lcd_stm32f0.c ****         {
+ 171              		.loc 2 203 32 is_stmt 0 view .LVU33
+ 172 0010 43B2     		sxtb	r3, r0
+ 203:Core/Inc/lcd_stm32f0.c ****         {
+ 173              		.loc 2 203 12 view .LVU34
+ 174 0012 002B     		cmp	r3, #0
+ 175 0014 46DB     		blt	.L24
+ 209:Core/Inc/lcd_stm32f0.c ****         }
+ 176              		.loc 2 209 10 is_stmt 1 view .LVU35
+ 209:Core/Inc/lcd_stm32f0.c ****         }
+ 177              		.loc 2 209 15 is_stmt 0 view .LVU36
+ 178 0016 9022     		movs	r2, #144
+ 179 0018 D205     		lsls	r2, r2, #23
+ 180 001a 9169     		ldr	r1, [r2, #24]
+ 209:Core/Inc/lcd_stm32f0.c ****         }
+ 181              		.loc 2 209 22 view .LVU37
+ 182 001c 8023     		movs	r3, #128
+ 183 001e 1B06     		lsls	r3, r3, #24
+ 184 0020 0B43     		orrs	r3, r1
+ 185 0022 9361     		str	r3, [r2, #24]
+ 186              	.L9:
+ 212:Core/Inc/lcd_stm32f0.c **** 	{
+ 187              		.loc 2 212 9 is_stmt 1 view .LVU38
+ 212:Core/Inc/lcd_stm32f0.c **** 	{
+ 188              		.loc 2 212 12 is_stmt 0 view .LVU39
+ 189 0024 6306     		lsls	r3, r4, #25
+ 190 0026 45D5     		bpl	.L10
+ 214:Core/Inc/lcd_stm32f0.c ****         }
+ 191              		.loc 2 214 13 is_stmt 1 view .LVU40
+ 214:Core/Inc/lcd_stm32f0.c ****         }
+ 192              		.loc 2 214 18 is_stmt 0 view .LVU41
+ 193 0028 9022     		movs	r2, #144
+ 194 002a D205     		lsls	r2, r2, #23
+ 195 002c 9169     		ldr	r1, [r2, #24]
+ 214:Core/Inc/lcd_stm32f0.c ****         }
+ 196              		.loc 2 214 25 view .LVU42
+ 197 002e 8023     		movs	r3, #128
+ 198 0030 5B01     		lsls	r3, r3, #5
+ 199 0032 0B43     		orrs	r3, r1
+ 200 0034 9361     		str	r3, [r2, #24]
+ 201              	.L11:
+ 222:Core/Inc/lcd_stm32f0.c **** 
+ 202              		.loc 2 222 9 is_stmt 1 view .LVU43
+ 222:Core/Inc/lcd_stm32f0.c **** 
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 11
+
+
+ 203              		.loc 2 222 12 is_stmt 0 view .LVU44
+ 204 0036 A306     		lsls	r3, r4, #26
+ 205 0038 44D5     		bpl	.L12
+ 225:Core/Inc/lcd_stm32f0.c **** 	}
+ 206              		.loc 2 225 10 is_stmt 1 view .LVU45
+ 225:Core/Inc/lcd_stm32f0.c **** 	}
+ 207              		.loc 2 225 15 is_stmt 0 view .LVU46
+ 208 003a 394A     		ldr	r2, .L25+4
+ 209 003c 9169     		ldr	r1, [r2, #24]
+ 225:Core/Inc/lcd_stm32f0.c **** 	}
+ 210              		.loc 2 225 22 view .LVU47
+ 211 003e 8023     		movs	r3, #128
+ 212 0040 9B00     		lsls	r3, r3, #2
+ 213 0042 0B43     		orrs	r3, r1
+ 214 0044 9361     		str	r3, [r2, #24]
+ 215              	.L13:
+ 232:Core/Inc/lcd_stm32f0.c ****         {
+ 216              		.loc 2 232 9 is_stmt 1 view .LVU48
+ 232:Core/Inc/lcd_stm32f0.c ****         {
+ 217              		.loc 2 232 12 is_stmt 0 view .LVU49
+ 218 0046 E306     		lsls	r3, r4, #27
+ 219 0048 43D5     		bpl	.L14
+ 234:Core/Inc/lcd_stm32f0.c ****         }
+ 220              		.loc 2 234 10 is_stmt 1 view .LVU50
+ 234:Core/Inc/lcd_stm32f0.c ****         }
+ 221              		.loc 2 234 15 is_stmt 0 view .LVU51
+ 222 004a 354A     		ldr	r2, .L25+4
+ 223 004c 9169     		ldr	r1, [r2, #24]
+ 234:Core/Inc/lcd_stm32f0.c ****         }
+ 224              		.loc 2 234 22 view .LVU52
+ 225 004e 8023     		movs	r3, #128
+ 226 0050 5B00     		lsls	r3, r3, #1
+ 227 0052 0B43     		orrs	r3, r1
+ 228 0054 9361     		str	r3, [r2, #24]
+ 229              	.L15:
+ 241:Core/Inc/lcd_stm32f0.c **** 
+ 230              		.loc 2 241 9 is_stmt 1 view .LVU53
+ 231 0056 FFF7FEFF 		bl	pulse_strobe
+ 232              	.LVL6:
+ 244:Core/Inc/lcd_stm32f0.c ****         {
+ 233              		.loc 2 244 9 view .LVU54
+ 244:Core/Inc/lcd_stm32f0.c ****         {
+ 234              		.loc 2 244 12 is_stmt 0 view .LVU55
+ 235 005a 2307     		lsls	r3, r4, #28
+ 236 005c 40D5     		bpl	.L16
+ 246:Core/Inc/lcd_stm32f0.c ****         }
+ 237              		.loc 2 246 10 is_stmt 1 view .LVU56
+ 246:Core/Inc/lcd_stm32f0.c ****         }
+ 238              		.loc 2 246 15 is_stmt 0 view .LVU57
+ 239 005e 9022     		movs	r2, #144
+ 240 0060 D205     		lsls	r2, r2, #23
+ 241 0062 9169     		ldr	r1, [r2, #24]
+ 246:Core/Inc/lcd_stm32f0.c ****         }
+ 242              		.loc 2 246 22 view .LVU58
+ 243 0064 8023     		movs	r3, #128
+ 244 0066 1B02     		lsls	r3, r3, #8
+ 245 0068 0B43     		orrs	r3, r1
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 12
+
+
+ 246 006a 9361     		str	r3, [r2, #24]
+ 247              	.L17:
+ 253:Core/Inc/lcd_stm32f0.c **** 	{
+ 248              		.loc 2 253 9 is_stmt 1 view .LVU59
+ 253:Core/Inc/lcd_stm32f0.c **** 	{
+ 249              		.loc 2 253 12 is_stmt 0 view .LVU60
+ 250 006c 6307     		lsls	r3, r4, #29
+ 251 006e 3FD5     		bpl	.L18
+ 255:Core/Inc/lcd_stm32f0.c ****         }
+ 252              		.loc 2 255 13 is_stmt 1 view .LVU61
+ 255:Core/Inc/lcd_stm32f0.c ****         }
+ 253              		.loc 2 255 18 is_stmt 0 view .LVU62
+ 254 0070 9022     		movs	r2, #144
+ 255 0072 D205     		lsls	r2, r2, #23
+ 256 0074 9169     		ldr	r1, [r2, #24]
+ 255:Core/Inc/lcd_stm32f0.c ****         }
+ 257              		.loc 2 255 25 view .LVU63
+ 258 0076 8023     		movs	r3, #128
+ 259 0078 5B01     		lsls	r3, r3, #5
+ 260 007a 0B43     		orrs	r3, r1
+ 261 007c 9361     		str	r3, [r2, #24]
+ 262              	.L19:
+ 263:Core/Inc/lcd_stm32f0.c ****         {
+ 263              		.loc 2 263 9 is_stmt 1 view .LVU64
+ 263:Core/Inc/lcd_stm32f0.c ****         {
+ 264              		.loc 2 263 12 is_stmt 0 view .LVU65
+ 265 007e A307     		lsls	r3, r4, #30
+ 266 0080 3ED5     		bpl	.L20
+ 265:Core/Inc/lcd_stm32f0.c **** 	}
+ 267              		.loc 2 265 10 is_stmt 1 view .LVU66
+ 265:Core/Inc/lcd_stm32f0.c **** 	}
+ 268              		.loc 2 265 15 is_stmt 0 view .LVU67
+ 269 0082 274A     		ldr	r2, .L25+4
+ 270 0084 9169     		ldr	r1, [r2, #24]
+ 265:Core/Inc/lcd_stm32f0.c **** 	}
+ 271              		.loc 2 265 22 view .LVU68
+ 272 0086 8023     		movs	r3, #128
+ 273 0088 9B00     		lsls	r3, r3, #2
+ 274 008a 0B43     		orrs	r3, r1
+ 275 008c 9361     		str	r3, [r2, #24]
+ 276              	.L21:
+ 272:Core/Inc/lcd_stm32f0.c ****         {
+ 277              		.loc 2 272 9 is_stmt 1 view .LVU69
+ 272:Core/Inc/lcd_stm32f0.c ****         {
+ 278              		.loc 2 272 12 is_stmt 0 view .LVU70
+ 279 008e E407     		lsls	r4, r4, #31
+ 280 0090 3DD5     		bpl	.L22
+ 274:Core/Inc/lcd_stm32f0.c ****         }
+ 281              		.loc 2 274 10 is_stmt 1 view .LVU71
+ 274:Core/Inc/lcd_stm32f0.c ****         }
+ 282              		.loc 2 274 15 is_stmt 0 view .LVU72
+ 283 0092 234A     		ldr	r2, .L25+4
+ 284 0094 9169     		ldr	r1, [r2, #24]
+ 274:Core/Inc/lcd_stm32f0.c ****         }
+ 285              		.loc 2 274 22 view .LVU73
+ 286 0096 8023     		movs	r3, #128
+ 287 0098 5B00     		lsls	r3, r3, #1
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 13
+
+
+ 288 009a 0B43     		orrs	r3, r1
+ 289 009c 9361     		str	r3, [r2, #24]
+ 290              	.L23:
+ 281:Core/Inc/lcd_stm32f0.c **** }
+ 291              		.loc 2 281 9 is_stmt 1 view .LVU74
+ 292 009e FFF7FEFF 		bl	pulse_strobe
+ 293              	.LVL7:
+ 282:Core/Inc/lcd_stm32f0.c **** 
+ 294              		.loc 2 282 1 is_stmt 0 view .LVU75
+ 295              		@ sp needed
+ 296 00a2 10BD     		pop	{r4, pc}
+ 297              	.LVL8:
+ 298              	.L24:
+ 205:Core/Inc/lcd_stm32f0.c ****         }
+ 299              		.loc 2 205 10 is_stmt 1 view .LVU76
+ 205:Core/Inc/lcd_stm32f0.c ****         }
+ 300              		.loc 2 205 15 is_stmt 0 view .LVU77
+ 301 00a4 9022     		movs	r2, #144
+ 302 00a6 D205     		lsls	r2, r2, #23
+ 303 00a8 9169     		ldr	r1, [r2, #24]
+ 205:Core/Inc/lcd_stm32f0.c ****         }
+ 304              		.loc 2 205 22 view .LVU78
+ 305 00aa 8023     		movs	r3, #128
+ 306 00ac 1B02     		lsls	r3, r3, #8
+ 307 00ae 0B43     		orrs	r3, r1
+ 308 00b0 9361     		str	r3, [r2, #24]
+ 309 00b2 B7E7     		b	.L9
+ 310              	.L10:
+ 219:Core/Inc/lcd_stm32f0.c ****         }
+ 311              		.loc 2 219 13 is_stmt 1 view .LVU79
+ 219:Core/Inc/lcd_stm32f0.c ****         }
+ 312              		.loc 2 219 18 is_stmt 0 view .LVU80
+ 313 00b4 9022     		movs	r2, #144
+ 314 00b6 D205     		lsls	r2, r2, #23
+ 315 00b8 9169     		ldr	r1, [r2, #24]
+ 219:Core/Inc/lcd_stm32f0.c ****         }
+ 316              		.loc 2 219 25 view .LVU81
+ 317 00ba 8023     		movs	r3, #128
+ 318 00bc 5B05     		lsls	r3, r3, #21
+ 319 00be 0B43     		orrs	r3, r1
+ 320 00c0 9361     		str	r3, [r2, #24]
+ 321 00c2 B8E7     		b	.L11
+ 322              	.L12:
+ 229:Core/Inc/lcd_stm32f0.c ****         }
+ 323              		.loc 2 229 10 is_stmt 1 view .LVU82
+ 229:Core/Inc/lcd_stm32f0.c ****         }
+ 324              		.loc 2 229 15 is_stmt 0 view .LVU83
+ 325 00c4 164A     		ldr	r2, .L25+4
+ 326 00c6 9169     		ldr	r1, [r2, #24]
+ 229:Core/Inc/lcd_stm32f0.c ****         }
+ 327              		.loc 2 229 22 view .LVU84
+ 328 00c8 8023     		movs	r3, #128
+ 329 00ca 9B04     		lsls	r3, r3, #18
+ 330 00cc 0B43     		orrs	r3, r1
+ 331 00ce 9361     		str	r3, [r2, #24]
+ 332 00d0 B9E7     		b	.L13
+ 333              	.L14:
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 14
+
+
+ 238:Core/Inc/lcd_stm32f0.c ****         }
+ 334              		.loc 2 238 10 is_stmt 1 view .LVU85
+ 238:Core/Inc/lcd_stm32f0.c ****         }
+ 335              		.loc 2 238 15 is_stmt 0 view .LVU86
+ 336 00d2 134A     		ldr	r2, .L25+4
+ 337 00d4 9169     		ldr	r1, [r2, #24]
+ 238:Core/Inc/lcd_stm32f0.c ****         }
+ 338              		.loc 2 238 22 view .LVU87
+ 339 00d6 8023     		movs	r3, #128
+ 340 00d8 5B04     		lsls	r3, r3, #17
+ 341 00da 0B43     		orrs	r3, r1
+ 342 00dc 9361     		str	r3, [r2, #24]
+ 343 00de BAE7     		b	.L15
+ 344              	.LVL9:
+ 345              	.L16:
+ 250:Core/Inc/lcd_stm32f0.c ****         }
+ 346              		.loc 2 250 10 is_stmt 1 view .LVU88
+ 250:Core/Inc/lcd_stm32f0.c ****         }
+ 347              		.loc 2 250 15 is_stmt 0 view .LVU89
+ 348 00e0 9022     		movs	r2, #144
+ 349 00e2 D205     		lsls	r2, r2, #23
+ 350 00e4 9169     		ldr	r1, [r2, #24]
+ 250:Core/Inc/lcd_stm32f0.c ****         }
+ 351              		.loc 2 250 22 view .LVU90
+ 352 00e6 8023     		movs	r3, #128
+ 353 00e8 1B06     		lsls	r3, r3, #24
+ 354 00ea 0B43     		orrs	r3, r1
+ 355 00ec 9361     		str	r3, [r2, #24]
+ 356 00ee BDE7     		b	.L17
+ 357              	.L18:
+ 260:Core/Inc/lcd_stm32f0.c ****         }
+ 358              		.loc 2 260 13 is_stmt 1 view .LVU91
+ 260:Core/Inc/lcd_stm32f0.c ****         }
+ 359              		.loc 2 260 18 is_stmt 0 view .LVU92
+ 360 00f0 9022     		movs	r2, #144
+ 361 00f2 D205     		lsls	r2, r2, #23
+ 362 00f4 9169     		ldr	r1, [r2, #24]
+ 260:Core/Inc/lcd_stm32f0.c ****         }
+ 363              		.loc 2 260 25 view .LVU93
+ 364 00f6 8023     		movs	r3, #128
+ 365 00f8 5B05     		lsls	r3, r3, #21
+ 366 00fa 0B43     		orrs	r3, r1
+ 367 00fc 9361     		str	r3, [r2, #24]
+ 368 00fe BEE7     		b	.L19
+ 369              	.L20:
+ 269:Core/Inc/lcd_stm32f0.c ****         }
+ 370              		.loc 2 269 10 is_stmt 1 view .LVU94
+ 269:Core/Inc/lcd_stm32f0.c ****         }
+ 371              		.loc 2 269 15 is_stmt 0 view .LVU95
+ 372 0100 074A     		ldr	r2, .L25+4
+ 373 0102 9169     		ldr	r1, [r2, #24]
+ 269:Core/Inc/lcd_stm32f0.c ****         }
+ 374              		.loc 2 269 22 view .LVU96
+ 375 0104 8023     		movs	r3, #128
+ 376 0106 9B04     		lsls	r3, r3, #18
+ 377 0108 0B43     		orrs	r3, r1
+ 378 010a 9361     		str	r3, [r2, #24]
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 15
+
+
+ 379 010c BFE7     		b	.L21
+ 380              	.L22:
+ 278:Core/Inc/lcd_stm32f0.c ****         }
+ 381              		.loc 2 278 10 is_stmt 1 view .LVU97
+ 278:Core/Inc/lcd_stm32f0.c ****         }
+ 382              		.loc 2 278 15 is_stmt 0 view .LVU98
+ 383 010e 044A     		ldr	r2, .L25+4
+ 384 0110 9169     		ldr	r1, [r2, #24]
+ 278:Core/Inc/lcd_stm32f0.c ****         }
+ 385              		.loc 2 278 22 view .LVU99
+ 386 0112 8023     		movs	r3, #128
+ 387 0114 5B04     		lsls	r3, r3, #17
+ 388 0116 0B43     		orrs	r3, r1
+ 389 0118 9361     		str	r3, [r2, #24]
+ 390 011a C0E7     		b	.L23
+ 391              	.L26:
+ 392              		.align	2
+ 393              	.L25:
+ 394 011c 00080048 		.word	1207961600
+ 395 0120 00040048 		.word	1207960576
+ 396              		.cfi_endproc
+ 397              	.LFE42:
+ 399              		.section	.text.lcd_putstring,"ax",%progbits
+ 400              		.align	1
+ 401              		.global	lcd_putstring
+ 402              		.syntax unified
+ 403              		.code	16
+ 404              		.thumb_func
+ 406              	lcd_putstring:
+ 407              	.LVL10:
+ 408              	.LFB43:
+ 291:Core/Inc/lcd_stm32f0.c ****     unsigned char count = 0;
+ 409              		.loc 2 291 1 is_stmt 1 view -0
+ 410              		.cfi_startproc
+ 411              		@ args = 0, pretend = 0, frame = 0
+ 412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 291:Core/Inc/lcd_stm32f0.c ****     unsigned char count = 0;
+ 413              		.loc 2 291 1 is_stmt 0 view .LVU101
+ 414 0000 70B5     		push	{r4, r5, r6, lr}
+ 415              		.cfi_def_cfa_offset 16
+ 416              		.cfi_offset 4, -16
+ 417              		.cfi_offset 5, -12
+ 418              		.cfi_offset 6, -8
+ 419              		.cfi_offset 14, -4
+ 420 0002 0500     		movs	r5, r0
+ 292:Core/Inc/lcd_stm32f0.c **** 
+ 421              		.loc 2 292 5 is_stmt 1 view .LVU102
+ 422              	.LVL11:
+ 294:Core/Inc/lcd_stm32f0.c ****     {
+ 423              		.loc 2 294 5 view .LVU103
+ 292:Core/Inc/lcd_stm32f0.c **** 
+ 424              		.loc 2 292 19 is_stmt 0 view .LVU104
+ 425 0004 0024     		movs	r4, #0
+ 294:Core/Inc/lcd_stm32f0.c ****     {
+ 426              		.loc 2 294 11 view .LVU105
+ 427 0006 03E0     		b	.L28
+ 428              	.LVL12:
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 16
+
+
+ 429              	.L29:
+ 296:Core/Inc/lcd_stm32f0.c **** 	    count++;
+ 430              		.loc 2 296 6 is_stmt 1 view .LVU106
+ 431 0008 FFF7FEFF 		bl	lcd_putchar
+ 432              	.LVL13:
+ 297:Core/Inc/lcd_stm32f0.c **** 	 }
+ 433              		.loc 2 297 6 view .LVU107
+ 297:Core/Inc/lcd_stm32f0.c **** 	 }
+ 434              		.loc 2 297 11 is_stmt 0 view .LVU108
+ 435 000c 0134     		adds	r4, r4, #1
+ 436              	.LVL14:
+ 297:Core/Inc/lcd_stm32f0.c **** 	 }
+ 437              		.loc 2 297 11 view .LVU109
+ 438 000e E4B2     		uxtb	r4, r4
+ 439              	.LVL15:
+ 440              	.L28:
+ 294:Core/Inc/lcd_stm32f0.c ****     {
+ 441              		.loc 2 294 12 is_stmt 1 view .LVU110
+ 294:Core/Inc/lcd_stm32f0.c ****     {
+ 442              		.loc 2 294 20 is_stmt 0 view .LVU111
+ 443 0010 285D     		ldrb	r0, [r5, r4]
+ 294:Core/Inc/lcd_stm32f0.c ****     {
+ 444              		.loc 2 294 12 view .LVU112
+ 445 0012 0028     		cmp	r0, #0
+ 446 0014 F8D1     		bne	.L29
+ 299:Core/Inc/lcd_stm32f0.c **** 
+ 447              		.loc 2 299 1 view .LVU113
+ 448              		@ sp needed
+ 449              	.LVL16:
+ 450              	.LVL17:
+ 299:Core/Inc/lcd_stm32f0.c **** 
+ 451              		.loc 2 299 1 view .LVU114
+ 452 0016 70BD     		pop	{r4, r5, r6, pc}
+ 453              		.cfi_endproc
+ 454              	.LFE43:
+ 456              		.section	.text.lcd_command,"ax",%progbits
+ 457              		.align	1
+ 458              		.global	lcd_command
+ 459              		.syntax unified
+ 460              		.code	16
+ 461              		.thumb_func
+ 463              	lcd_command:
+ 464              	.LVL18:
+ 465              	.LFB40:
+  72:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_RS_RESET;	// Register Select (RS)line low (data sent will now be read as com
+ 466              		.loc 2 72 1 is_stmt 1 view -0
+ 467              		.cfi_startproc
+ 468              		@ args = 0, pretend = 0, frame = 0
+ 469              		@ frame_needed = 0, uses_anonymous_args = 0
+  72:Core/Inc/lcd_stm32f0.c ****     GPIOC->BSRR |= LCD_RS_RESET;	// Register Select (RS)line low (data sent will now be read as com
+ 470              		.loc 2 72 1 is_stmt 0 view .LVU116
+ 471 0000 10B5     		push	{r4, lr}
+ 472              		.cfi_def_cfa_offset 8
+ 473              		.cfi_offset 4, -8
+ 474              		.cfi_offset 14, -4
+ 475 0002 0400     		movs	r4, r0
+  73:Core/Inc/lcd_stm32f0.c **** 
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 17
+
+
+ 476              		.loc 2 73 5 is_stmt 1 view .LVU117
+  73:Core/Inc/lcd_stm32f0.c **** 
+ 477              		.loc 2 73 10 is_stmt 0 view .LVU118
+ 478 0004 474A     		ldr	r2, .L48
+ 479 0006 9169     		ldr	r1, [r2, #24]
+  73:Core/Inc/lcd_stm32f0.c **** 
+ 480              		.loc 2 73 17 view .LVU119
+ 481 0008 8023     		movs	r3, #128
+ 482 000a DB05     		lsls	r3, r3, #23
+ 483 000c 0B43     		orrs	r3, r1
+ 484 000e 9361     		str	r3, [r2, #24]
+  77:Core/Inc/lcd_stm32f0.c ****     {
+ 485              		.loc 2 77 5 is_stmt 1 view .LVU120
+  77:Core/Inc/lcd_stm32f0.c ****     {
+ 486              		.loc 2 77 26 is_stmt 0 view .LVU121
+ 487 0010 43B2     		sxtb	r3, r0
+  77:Core/Inc/lcd_stm32f0.c ****     {
+ 488              		.loc 2 77 8 view .LVU122
+ 489 0012 002B     		cmp	r3, #0
+ 490 0014 49DB     		blt	.L47
+  83:Core/Inc/lcd_stm32f0.c ****     }
+ 491              		.loc 2 83 6 is_stmt 1 view .LVU123
+  83:Core/Inc/lcd_stm32f0.c ****     }
+ 492              		.loc 2 83 11 is_stmt 0 view .LVU124
+ 493 0016 9022     		movs	r2, #144
+ 494 0018 D205     		lsls	r2, r2, #23
+ 495 001a 9169     		ldr	r1, [r2, #24]
+  83:Core/Inc/lcd_stm32f0.c ****     }
+ 496              		.loc 2 83 18 view .LVU125
+ 497 001c 8023     		movs	r3, #128
+ 498 001e 1B06     		lsls	r3, r3, #24
+ 499 0020 0B43     		orrs	r3, r1
+ 500 0022 9361     		str	r3, [r2, #24]
+ 501              	.L32:
+  86:Core/Inc/lcd_stm32f0.c ****     {
+ 502              		.loc 2 86 5 is_stmt 1 view .LVU126
+  86:Core/Inc/lcd_stm32f0.c ****     {
+ 503              		.loc 2 86 8 is_stmt 0 view .LVU127
+ 504 0024 6306     		lsls	r3, r4, #25
+ 505 0026 48D5     		bpl	.L33
+  88:Core/Inc/lcd_stm32f0.c ****     }
+ 506              		.loc 2 88 9 is_stmt 1 view .LVU128
+  88:Core/Inc/lcd_stm32f0.c ****     }
+ 507              		.loc 2 88 14 is_stmt 0 view .LVU129
+ 508 0028 9022     		movs	r2, #144
+ 509 002a D205     		lsls	r2, r2, #23
+ 510 002c 9169     		ldr	r1, [r2, #24]
+  88:Core/Inc/lcd_stm32f0.c ****     }
+ 511              		.loc 2 88 21 view .LVU130
+ 512 002e 8023     		movs	r3, #128
+ 513 0030 5B01     		lsls	r3, r3, #5
+ 514 0032 0B43     		orrs	r3, r1
+ 515 0034 9361     		str	r3, [r2, #24]
+ 516              	.L34:
+  95:Core/Inc/lcd_stm32f0.c ****     {
+ 517              		.loc 2 95 5 is_stmt 1 view .LVU131
+  95:Core/Inc/lcd_stm32f0.c ****     {
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 18
+
+
+ 518              		.loc 2 95 8 is_stmt 0 view .LVU132
+ 519 0036 A306     		lsls	r3, r4, #26
+ 520 0038 47D5     		bpl	.L35
+  97:Core/Inc/lcd_stm32f0.c ****     }
+ 521              		.loc 2 97 6 is_stmt 1 view .LVU133
+  97:Core/Inc/lcd_stm32f0.c ****     }
+ 522              		.loc 2 97 11 is_stmt 0 view .LVU134
+ 523 003a 3B4A     		ldr	r2, .L48+4
+ 524 003c 9169     		ldr	r1, [r2, #24]
+  97:Core/Inc/lcd_stm32f0.c ****     }
+ 525              		.loc 2 97 18 view .LVU135
+ 526 003e 8023     		movs	r3, #128
+ 527 0040 9B00     		lsls	r3, r3, #2
+ 528 0042 0B43     		orrs	r3, r1
+ 529 0044 9361     		str	r3, [r2, #24]
+ 530              	.L36:
+ 104:Core/Inc/lcd_stm32f0.c ****     {
+ 531              		.loc 2 104 5 is_stmt 1 view .LVU136
+ 104:Core/Inc/lcd_stm32f0.c ****     {
+ 532              		.loc 2 104 8 is_stmt 0 view .LVU137
+ 533 0046 E306     		lsls	r3, r4, #27
+ 534 0048 46D5     		bpl	.L37
+ 106:Core/Inc/lcd_stm32f0.c ****     }
+ 535              		.loc 2 106 6 is_stmt 1 view .LVU138
+ 106:Core/Inc/lcd_stm32f0.c ****     }
+ 536              		.loc 2 106 11 is_stmt 0 view .LVU139
+ 537 004a 374A     		ldr	r2, .L48+4
+ 538 004c 9169     		ldr	r1, [r2, #24]
+ 106:Core/Inc/lcd_stm32f0.c ****     }
+ 539              		.loc 2 106 18 view .LVU140
+ 540 004e 8023     		movs	r3, #128
+ 541 0050 5B00     		lsls	r3, r3, #1
+ 542 0052 0B43     		orrs	r3, r1
+ 543 0054 9361     		str	r3, [r2, #24]
+ 544              	.L38:
+ 113:Core/Inc/lcd_stm32f0.c **** 
+ 545              		.loc 2 113 5 is_stmt 1 view .LVU141
+ 546 0056 FFF7FEFF 		bl	pulse_strobe
+ 547              	.LVL19:
+ 116:Core/Inc/lcd_stm32f0.c ****     {
+ 548              		.loc 2 116 5 view .LVU142
+ 116:Core/Inc/lcd_stm32f0.c ****     {
+ 549              		.loc 2 116 8 is_stmt 0 view .LVU143
+ 550 005a 2307     		lsls	r3, r4, #28
+ 551 005c 43D5     		bpl	.L39
+ 118:Core/Inc/lcd_stm32f0.c ****     }
+ 552              		.loc 2 118 6 is_stmt 1 view .LVU144
+ 118:Core/Inc/lcd_stm32f0.c ****     }
+ 553              		.loc 2 118 11 is_stmt 0 view .LVU145
+ 554 005e 9022     		movs	r2, #144
+ 555 0060 D205     		lsls	r2, r2, #23
+ 556 0062 9169     		ldr	r1, [r2, #24]
+ 118:Core/Inc/lcd_stm32f0.c ****     }
+ 557              		.loc 2 118 18 view .LVU146
+ 558 0064 8023     		movs	r3, #128
+ 559 0066 1B02     		lsls	r3, r3, #8
+ 560 0068 0B43     		orrs	r3, r1
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 19
+
+
+ 561 006a 9361     		str	r3, [r2, #24]
+ 562              	.L40:
+ 125:Core/Inc/lcd_stm32f0.c ****     {
+ 563              		.loc 2 125 5 is_stmt 1 view .LVU147
+ 125:Core/Inc/lcd_stm32f0.c ****     {
+ 564              		.loc 2 125 8 is_stmt 0 view .LVU148
+ 565 006c 6307     		lsls	r3, r4, #29
+ 566 006e 42D5     		bpl	.L41
+ 127:Core/Inc/lcd_stm32f0.c ****     }
+ 567              		.loc 2 127 9 is_stmt 1 view .LVU149
+ 127:Core/Inc/lcd_stm32f0.c ****     }
+ 568              		.loc 2 127 14 is_stmt 0 view .LVU150
+ 569 0070 9022     		movs	r2, #144
+ 570 0072 D205     		lsls	r2, r2, #23
+ 571 0074 9169     		ldr	r1, [r2, #24]
+ 127:Core/Inc/lcd_stm32f0.c ****     }
+ 572              		.loc 2 127 21 view .LVU151
+ 573 0076 8023     		movs	r3, #128
+ 574 0078 5B01     		lsls	r3, r3, #5
+ 575 007a 0B43     		orrs	r3, r1
+ 576 007c 9361     		str	r3, [r2, #24]
+ 577              	.L42:
+ 134:Core/Inc/lcd_stm32f0.c ****     {
+ 578              		.loc 2 134 5 is_stmt 1 view .LVU152
+ 134:Core/Inc/lcd_stm32f0.c ****     {
+ 579              		.loc 2 134 8 is_stmt 0 view .LVU153
+ 580 007e A307     		lsls	r3, r4, #30
+ 581 0080 41D5     		bpl	.L43
+ 136:Core/Inc/lcd_stm32f0.c ****     }
+ 582              		.loc 2 136 6 is_stmt 1 view .LVU154
+ 136:Core/Inc/lcd_stm32f0.c ****     }
+ 583              		.loc 2 136 11 is_stmt 0 view .LVU155
+ 584 0082 294A     		ldr	r2, .L48+4
+ 585 0084 9169     		ldr	r1, [r2, #24]
+ 136:Core/Inc/lcd_stm32f0.c ****     }
+ 586              		.loc 2 136 18 view .LVU156
+ 587 0086 8023     		movs	r3, #128
+ 588 0088 9B00     		lsls	r3, r3, #2
+ 589 008a 0B43     		orrs	r3, r1
+ 590 008c 9361     		str	r3, [r2, #24]
+ 591              	.L44:
+ 143:Core/Inc/lcd_stm32f0.c ****     {
+ 592              		.loc 2 143 5 is_stmt 1 view .LVU157
+ 143:Core/Inc/lcd_stm32f0.c ****     {
+ 593              		.loc 2 143 8 is_stmt 0 view .LVU158
+ 594 008e E407     		lsls	r4, r4, #31
+ 595 0090 40D5     		bpl	.L45
+ 145:Core/Inc/lcd_stm32f0.c ****     }
+ 596              		.loc 2 145 6 is_stmt 1 view .LVU159
+ 145:Core/Inc/lcd_stm32f0.c ****     }
+ 597              		.loc 2 145 11 is_stmt 0 view .LVU160
+ 598 0092 254A     		ldr	r2, .L48+4
+ 599 0094 9169     		ldr	r1, [r2, #24]
+ 145:Core/Inc/lcd_stm32f0.c ****     }
+ 600              		.loc 2 145 18 view .LVU161
+ 601 0096 8023     		movs	r3, #128
+ 602 0098 5B00     		lsls	r3, r3, #1
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 20
+
+
+ 603 009a 0B43     		orrs	r3, r1
+ 604 009c 9361     		str	r3, [r2, #24]
+ 605              	.L46:
+ 152:Core/Inc/lcd_stm32f0.c ****     delay(3000);
+ 606              		.loc 2 152 5 is_stmt 1 view .LVU162
+ 607 009e FFF7FEFF 		bl	pulse_strobe
+ 608              	.LVL20:
+ 153:Core/Inc/lcd_stm32f0.c **** }
+ 609              		.loc 2 153 5 view .LVU163
+ 610 00a2 2248     		ldr	r0, .L48+8
+ 611 00a4 FFF7FEFF 		bl	delay
+ 612              	.LVL21:
+ 154:Core/Inc/lcd_stm32f0.c **** 
+ 613              		.loc 2 154 1 is_stmt 0 view .LVU164
+ 614              		@ sp needed
+ 615 00a8 10BD     		pop	{r4, pc}
+ 616              	.LVL22:
+ 617              	.L47:
+  79:Core/Inc/lcd_stm32f0.c ****     }
+ 618              		.loc 2 79 6 is_stmt 1 view .LVU165
+  79:Core/Inc/lcd_stm32f0.c ****     }
+ 619              		.loc 2 79 11 is_stmt 0 view .LVU166
+ 620 00aa 9022     		movs	r2, #144
+ 621 00ac D205     		lsls	r2, r2, #23
+ 622 00ae 9169     		ldr	r1, [r2, #24]
+  79:Core/Inc/lcd_stm32f0.c ****     }
+ 623              		.loc 2 79 18 view .LVU167
+ 624 00b0 8023     		movs	r3, #128
+ 625 00b2 1B02     		lsls	r3, r3, #8
+ 626 00b4 0B43     		orrs	r3, r1
+ 627 00b6 9361     		str	r3, [r2, #24]
+ 628 00b8 B4E7     		b	.L32
+ 629              	.L33:
+  92:Core/Inc/lcd_stm32f0.c ****     }
+ 630              		.loc 2 92 9 is_stmt 1 view .LVU168
+  92:Core/Inc/lcd_stm32f0.c ****     }
+ 631              		.loc 2 92 14 is_stmt 0 view .LVU169
+ 632 00ba 9022     		movs	r2, #144
+ 633 00bc D205     		lsls	r2, r2, #23
+ 634 00be 9169     		ldr	r1, [r2, #24]
+  92:Core/Inc/lcd_stm32f0.c ****     }
+ 635              		.loc 2 92 21 view .LVU170
+ 636 00c0 8023     		movs	r3, #128
+ 637 00c2 5B05     		lsls	r3, r3, #21
+ 638 00c4 0B43     		orrs	r3, r1
+ 639 00c6 9361     		str	r3, [r2, #24]
+ 640 00c8 B5E7     		b	.L34
+ 641              	.L35:
+ 101:Core/Inc/lcd_stm32f0.c ****     }
+ 642              		.loc 2 101 6 is_stmt 1 view .LVU171
+ 101:Core/Inc/lcd_stm32f0.c ****     }
+ 643              		.loc 2 101 11 is_stmt 0 view .LVU172
+ 644 00ca 174A     		ldr	r2, .L48+4
+ 645 00cc 9169     		ldr	r1, [r2, #24]
+ 101:Core/Inc/lcd_stm32f0.c ****     }
+ 646              		.loc 2 101 18 view .LVU173
+ 647 00ce 8023     		movs	r3, #128
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 21
+
+
+ 648 00d0 9B04     		lsls	r3, r3, #18
+ 649 00d2 0B43     		orrs	r3, r1
+ 650 00d4 9361     		str	r3, [r2, #24]
+ 651 00d6 B6E7     		b	.L36
+ 652              	.L37:
+ 110:Core/Inc/lcd_stm32f0.c ****     }
+ 653              		.loc 2 110 6 is_stmt 1 view .LVU174
+ 110:Core/Inc/lcd_stm32f0.c ****     }
+ 654              		.loc 2 110 11 is_stmt 0 view .LVU175
+ 655 00d8 134A     		ldr	r2, .L48+4
+ 656 00da 9169     		ldr	r1, [r2, #24]
+ 110:Core/Inc/lcd_stm32f0.c ****     }
+ 657              		.loc 2 110 18 view .LVU176
+ 658 00dc 8023     		movs	r3, #128
+ 659 00de 5B04     		lsls	r3, r3, #17
+ 660 00e0 0B43     		orrs	r3, r1
+ 661 00e2 9361     		str	r3, [r2, #24]
+ 662 00e4 B7E7     		b	.L38
+ 663              	.LVL23:
+ 664              	.L39:
+ 122:Core/Inc/lcd_stm32f0.c ****     }
+ 665              		.loc 2 122 6 is_stmt 1 view .LVU177
+ 122:Core/Inc/lcd_stm32f0.c ****     }
+ 666              		.loc 2 122 11 is_stmt 0 view .LVU178
+ 667 00e6 9022     		movs	r2, #144
+ 668 00e8 D205     		lsls	r2, r2, #23
+ 669 00ea 9169     		ldr	r1, [r2, #24]
+ 122:Core/Inc/lcd_stm32f0.c ****     }
+ 670              		.loc 2 122 18 view .LVU179
+ 671 00ec 8023     		movs	r3, #128
+ 672 00ee 1B06     		lsls	r3, r3, #24
+ 673 00f0 0B43     		orrs	r3, r1
+ 674 00f2 9361     		str	r3, [r2, #24]
+ 675 00f4 BAE7     		b	.L40
+ 676              	.L41:
+ 131:Core/Inc/lcd_stm32f0.c ****     }
+ 677              		.loc 2 131 9 is_stmt 1 view .LVU180
+ 131:Core/Inc/lcd_stm32f0.c ****     }
+ 678              		.loc 2 131 14 is_stmt 0 view .LVU181
+ 679 00f6 9022     		movs	r2, #144
+ 680 00f8 D205     		lsls	r2, r2, #23
+ 681 00fa 9169     		ldr	r1, [r2, #24]
+ 131:Core/Inc/lcd_stm32f0.c ****     }
+ 682              		.loc 2 131 21 view .LVU182
+ 683 00fc 8023     		movs	r3, #128
+ 684 00fe 5B05     		lsls	r3, r3, #21
+ 685 0100 0B43     		orrs	r3, r1
+ 686 0102 9361     		str	r3, [r2, #24]
+ 687 0104 BBE7     		b	.L42
+ 688              	.L43:
+ 140:Core/Inc/lcd_stm32f0.c ****     }
+ 689              		.loc 2 140 6 is_stmt 1 view .LVU183
+ 140:Core/Inc/lcd_stm32f0.c ****     }
+ 690              		.loc 2 140 11 is_stmt 0 view .LVU184
+ 691 0106 084A     		ldr	r2, .L48+4
+ 692 0108 9169     		ldr	r1, [r2, #24]
+ 140:Core/Inc/lcd_stm32f0.c ****     }
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 22
+
+
+ 693              		.loc 2 140 18 view .LVU185
+ 694 010a 8023     		movs	r3, #128
+ 695 010c 9B04     		lsls	r3, r3, #18
+ 696 010e 0B43     		orrs	r3, r1
+ 697 0110 9361     		str	r3, [r2, #24]
+ 698 0112 BCE7     		b	.L44
+ 699              	.L45:
+ 149:Core/Inc/lcd_stm32f0.c ****     }
+ 700              		.loc 2 149 6 is_stmt 1 view .LVU186
+ 149:Core/Inc/lcd_stm32f0.c ****     }
+ 701              		.loc 2 149 11 is_stmt 0 view .LVU187
+ 702 0114 044A     		ldr	r2, .L48+4
+ 703 0116 9169     		ldr	r1, [r2, #24]
+ 149:Core/Inc/lcd_stm32f0.c ****     }
+ 704              		.loc 2 149 18 view .LVU188
+ 705 0118 8023     		movs	r3, #128
+ 706 011a 5B04     		lsls	r3, r3, #17
+ 707 011c 0B43     		orrs	r3, r1
+ 708 011e 9361     		str	r3, [r2, #24]
+ 709 0120 BDE7     		b	.L46
+ 710              	.L49:
+ 711 0122 C046     		.align	2
+ 712              	.L48:
+ 713 0124 00080048 		.word	1207961600
+ 714 0128 00040048 		.word	1207960576
+ 715 012c B80B0000 		.word	3000
+ 716              		.cfi_endproc
+ 717              	.LFE40:
+ 719              		.section	.text.init_LCD,"ax",%progbits
+ 720              		.align	1
+ 721              		.global	init_LCD
+ 722              		.syntax unified
+ 723              		.code	16
+ 724              		.thumb_func
+ 726              	init_LCD:
+ 727              	.LFB41:
+ 168:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;	// Connect clocks to GPIO A, B and C
+ 728              		.loc 2 168 1 is_stmt 1 view -0
+ 729              		.cfi_startproc
+ 730              		@ args = 0, pretend = 0, frame = 0
+ 731              		@ frame_needed = 0, uses_anonymous_args = 0
+ 732 0000 10B5     		push	{r4, lr}
+ 733              		.cfi_def_cfa_offset 8
+ 734              		.cfi_offset 4, -8
+ 735              		.cfi_offset 14, -4
+ 169:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+ 736              		.loc 2 169 5 view .LVU190
+ 169:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+ 737              		.loc 2 169 8 is_stmt 0 view .LVU191
+ 738 0002 1B4B     		ldr	r3, .L51
+ 739 0004 5969     		ldr	r1, [r3, #20]
+ 169:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+ 740              		.loc 2 169 17 view .LVU192
+ 741 0006 8022     		movs	r2, #128
+ 742 0008 9202     		lsls	r2, r2, #10
+ 743 000a 0A43     		orrs	r2, r1
+ 744 000c 5A61     		str	r2, [r3, #20]
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 23
+
+
+ 170:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+ 745              		.loc 2 170 5 is_stmt 1 view .LVU193
+ 170:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+ 746              		.loc 2 170 8 is_stmt 0 view .LVU194
+ 747 000e 5969     		ldr	r1, [r3, #20]
+ 170:Core/Inc/lcd_stm32f0.c ****     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+ 748              		.loc 2 170 17 view .LVU195
+ 749 0010 8022     		movs	r2, #128
+ 750 0012 D202     		lsls	r2, r2, #11
+ 751 0014 0A43     		orrs	r2, r1
+ 752 0016 5A61     		str	r2, [r3, #20]
+ 171:Core/Inc/lcd_stm32f0.c **** 
+ 753              		.loc 2 171 5 is_stmt 1 view .LVU196
+ 171:Core/Inc/lcd_stm32f0.c **** 
+ 754              		.loc 2 171 8 is_stmt 0 view .LVU197
+ 755 0018 5969     		ldr	r1, [r3, #20]
+ 171:Core/Inc/lcd_stm32f0.c **** 
+ 756              		.loc 2 171 17 view .LVU198
+ 757 001a 8022     		movs	r2, #128
+ 758 001c 1203     		lsls	r2, r2, #12
+ 759 001e 0A43     		orrs	r2, r1
+ 760 0020 5A61     		str	r2, [r3, #20]
+ 173:Core/Inc/lcd_stm32f0.c ****     GPIOB->MODER |= (GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0);   // D4 and D5
+ 761              		.loc 2 173 5 is_stmt 1 view .LVU199
+ 173:Core/Inc/lcd_stm32f0.c ****     GPIOB->MODER |= (GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0);   // D4 and D5
+ 762              		.loc 2 173 10 is_stmt 0 view .LVU200
+ 763 0022 9022     		movs	r2, #144
+ 764 0024 D205     		lsls	r2, r2, #23
+ 765 0026 1168     		ldr	r1, [r2]
+ 173:Core/Inc/lcd_stm32f0.c ****     GPIOB->MODER |= (GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0);   // D4 and D5
+ 766              		.loc 2 173 18 view .LVU201
+ 767 0028 8223     		movs	r3, #130
+ 768 002a DB05     		lsls	r3, r3, #23
+ 769 002c 0B43     		orrs	r3, r1
+ 770 002e 1360     		str	r3, [r2]
+ 174:Core/Inc/lcd_stm32f0.c ****     GPIOC->MODER |= (GPIO_MODER_MODER14_0|GPIO_MODER_MODER15_0); // RS and EN
+ 771              		.loc 2 174 5 is_stmt 1 view .LVU202
+ 174:Core/Inc/lcd_stm32f0.c ****     GPIOC->MODER |= (GPIO_MODER_MODER14_0|GPIO_MODER_MODER15_0); // RS and EN
+ 772              		.loc 2 174 10 is_stmt 0 view .LVU203
+ 773 0030 104A     		ldr	r2, .L51+4
+ 774 0032 1168     		ldr	r1, [r2]
+ 174:Core/Inc/lcd_stm32f0.c ****     GPIOC->MODER |= (GPIO_MODER_MODER14_0|GPIO_MODER_MODER15_0); // RS and EN
+ 775              		.loc 2 174 18 view .LVU204
+ 776 0034 A023     		movs	r3, #160
+ 777 0036 DB02     		lsls	r3, r3, #11
+ 778 0038 0B43     		orrs	r3, r1
+ 779 003a 1360     		str	r3, [r2]
+ 175:Core/Inc/lcd_stm32f0.c **** 
+ 780              		.loc 2 175 5 is_stmt 1 view .LVU205
+ 175:Core/Inc/lcd_stm32f0.c **** 
+ 781              		.loc 2 175 10 is_stmt 0 view .LVU206
+ 782 003c 0E4A     		ldr	r2, .L51+8
+ 783 003e 1168     		ldr	r1, [r2]
+ 175:Core/Inc/lcd_stm32f0.c **** 
+ 784              		.loc 2 175 18 view .LVU207
+ 785 0040 A023     		movs	r3, #160
+ 786 0042 DB05     		lsls	r3, r3, #23
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 24
+
+
+ 787 0044 0B43     		orrs	r3, r1
+ 788 0046 1360     		str	r3, [r2]
+ 177:Core/Inc/lcd_stm32f0.c **** 
+ 789              		.loc 2 177 5 is_stmt 1 view .LVU208
+ 790 0048 0C48     		ldr	r0, .L51+12
+ 791 004a FFF7FEFF 		bl	delay
+ 792              	.LVL24:
+ 179:Core/Inc/lcd_stm32f0.c ****     lcd_command(FOURBIT_MODE);		// Set LCD into 4 bit mode
+ 793              		.loc 2 179 5 view .LVU209
+ 794 004e 3320     		movs	r0, #51
+ 795 0050 FFF7FEFF 		bl	lcd_command
+ 796              	.LVL25:
+ 180:Core/Inc/lcd_stm32f0.c ****     lcd_command(DISPLAY_ON);		// Turn display on and set up cursor
+ 797              		.loc 2 180 5 view .LVU210
+ 798 0054 3220     		movs	r0, #50
+ 799 0056 FFF7FEFF 		bl	lcd_command
+ 800              	.LVL26:
+ 181:Core/Inc/lcd_stm32f0.c ****     lcd_command(TWOLINE_MODE);		// Set up 2 lines and character size
+ 801              		.loc 2 181 5 view .LVU211
+ 802 005a 0C20     		movs	r0, #12
+ 803 005c FFF7FEFF 		bl	lcd_command
+ 804              	.LVL27:
+ 182:Core/Inc/lcd_stm32f0.c ****     lcd_command(CLEAR);			// Clear display
+ 805              		.loc 2 182 5 view .LVU212
+ 806 0060 2820     		movs	r0, #40
+ 807 0062 FFF7FEFF 		bl	lcd_command
+ 808              	.LVL28:
+ 183:Core/Inc/lcd_stm32f0.c **** }
+ 809              		.loc 2 183 5 view .LVU213
+ 810 0066 0120     		movs	r0, #1
+ 811 0068 FFF7FEFF 		bl	lcd_command
+ 812              	.LVL29:
+ 184:Core/Inc/lcd_stm32f0.c **** 
+ 813              		.loc 2 184 1 is_stmt 0 view .LVU214
+ 814              		@ sp needed
+ 815 006c 10BD     		pop	{r4, pc}
+ 816              	.L52:
+ 817 006e C046     		.align	2
+ 818              	.L51:
+ 819 0070 00100240 		.word	1073876992
+ 820 0074 00040048 		.word	1207960576
+ 821 0078 00080048 		.word	1207961600
+ 822 007c 30750000 		.word	30000
+ 823              		.cfi_endproc
+ 824              	.LFE41:
+ 826              		.section	.rodata.helloWorld.str1.4,"aMS",%progbits,1
+ 827              		.align	2
+ 828              	.LC0:
+ 829 0000 48656C6C 		.ascii	"Hello World! :)\000"
+ 829      6F20576F 
+ 829      726C6421 
+ 829      203A2900 
+ 830              		.section	.text.helloWorld,"ax",%progbits
+ 831              		.align	1
+ 832              		.global	helloWorld
+ 833              		.syntax unified
+ 834              		.code	16
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 25
+
+
+ 835              		.thumb_func
+ 837              	helloWorld:
+ 838              	.LFB47:
+   1:Core/Src/main.c **** //********************************************************************
+   2:Core/Src/main.c **** //*                    EEE2046F C template                           *
+   3:Core/Src/main.c **** //*==================================================================*
+   4:Core/Src/main.c **** //* WRITTEN BY: Jesse Arendse   	                 		               *
+   5:Core/Src/main.c **** //* DATE CREATED: 07/04/2023                                         *
+   6:Core/Src/main.c **** //* MODIFIED:                                                        *
+   7:Core/Src/main.c **** //*==================================================================*
+   8:Core/Src/main.c **** //* PROGRAMMED IN: Visual Studio Code                                *
+   9:Core/Src/main.c **** //* TARGET:        STM32F0                                           *
+  10:Core/Src/main.c **** //*==================================================================*
+  11:Core/Src/main.c **** //* DESCRIPTION:                                                     *
+  12:Core/Src/main.c **** //*                                                                  *
+  13:Core/Src/main.c **** //********************************************************************
+  14:Core/Src/main.c **** // INCLUDE FILES
+  15:Core/Src/main.c **** //====================================================================
+  16:Core/Src/main.c **** #include "stm32f0xx.h"
+  17:Core/Src/main.c **** #include <lcd_stm32f0.c>
+  18:Core/Src/main.c **** //====================================================================
+  19:Core/Src/main.c **** // GLOBAL CONSTANTS
+  20:Core/Src/main.c **** //====================================================================
+  21:Core/Src/main.c **** 
+  22:Core/Src/main.c **** //====================================================================
+  23:Core/Src/main.c **** // GLOBAL VARIABLES
+  24:Core/Src/main.c **** //====================================================================
+  25:Core/Src/main.c **** 
+  26:Core/Src/main.c **** //====================================================================
+  27:Core/Src/main.c **** // FUNCTION DECLARATIONS
+  28:Core/Src/main.c **** //====================================================================
+  29:Core/Src/main.c **** void helloWorld();
+  30:Core/Src/main.c **** //====================================================================
+  31:Core/Src/main.c **** // MAIN FUNCTION
+  32:Core/Src/main.c **** //====================================================================
+  33:Core/Src/main.c **** int main (void)
+  34:Core/Src/main.c **** {
+  35:Core/Src/main.c ****     helloWorld();
+  36:Core/Src/main.c **** 
+  37:Core/Src/main.c ****     
+  38:Core/Src/main.c ****     while (1){
+  39:Core/Src/main.c **** 
+  40:Core/Src/main.c ****     }
+  41:Core/Src/main.c **** 
+  42:Core/Src/main.c **** }							// End of main
+  43:Core/Src/main.c **** 
+  44:Core/Src/main.c **** //====================================================================
+  45:Core/Src/main.c **** // FUNCTION DEFINITIONS
+  46:Core/Src/main.c **** //====================================================================
+  47:Core/Src/main.c **** void helloWorld(){
+ 839              		.loc 1 47 18 is_stmt 1 view -0
+ 840              		.cfi_startproc
+ 841              		@ args = 0, pretend = 0, frame = 0
+ 842              		@ frame_needed = 0, uses_anonymous_args = 0
+ 843 0000 10B5     		push	{r4, lr}
+ 844              		.cfi_def_cfa_offset 8
+ 845              		.cfi_offset 4, -8
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 26
+
+
+ 846              		.cfi_offset 14, -4
+  48:Core/Src/main.c ****     init_LCD();
+ 847              		.loc 1 48 5 view .LVU216
+ 848 0002 FFF7FEFF 		bl	init_LCD
+ 849              	.LVL30:
+  49:Core/Src/main.c ****     lcd_command(CLEAR);
+ 850              		.loc 1 49 5 view .LVU217
+ 851 0006 0120     		movs	r0, #1
+ 852 0008 FFF7FEFF 		bl	lcd_command
+ 853              	.LVL31:
+  50:Core/Src/main.c ****     lcd_putstring("Hello World! :)");
+ 854              		.loc 1 50 5 view .LVU218
+ 855 000c 0148     		ldr	r0, .L54
+ 856 000e FFF7FEFF 		bl	lcd_putstring
+ 857              	.LVL32:
+  51:Core/Src/main.c **** }
+ 858              		.loc 1 51 1 is_stmt 0 view .LVU219
+ 859              		@ sp needed
+ 860 0012 10BD     		pop	{r4, pc}
+ 861              	.L55:
+ 862              		.align	2
+ 863              	.L54:
+ 864 0014 00000000 		.word	.LC0
+ 865              		.cfi_endproc
+ 866              	.LFE47:
+ 868              		.section	.text.main,"ax",%progbits
+ 869              		.align	1
+ 870              		.global	main
+ 871              		.syntax unified
+ 872              		.code	16
+ 873              		.thumb_func
+ 875              	main:
+ 876              	.LFB46:
+  34:Core/Src/main.c ****     helloWorld();
+ 877              		.loc 1 34 1 is_stmt 1 view -0
+ 878              		.cfi_startproc
+ 879              		@ Volatile: function does not return.
+ 880              		@ args = 0, pretend = 0, frame = 0
+ 881              		@ frame_needed = 0, uses_anonymous_args = 0
+ 882 0000 10B5     		push	{r4, lr}
+ 883              		.cfi_def_cfa_offset 8
+ 884              		.cfi_offset 4, -8
+ 885              		.cfi_offset 14, -4
+  35:Core/Src/main.c **** 
+ 886              		.loc 1 35 5 view .LVU221
+ 887 0002 FFF7FEFF 		bl	helloWorld
+ 888              	.LVL33:
+ 889              	.L57:
+  38:Core/Src/main.c **** 
+ 890              		.loc 1 38 5 discriminator 1 view .LVU222
+  40:Core/Src/main.c **** 
+ 891              		.loc 1 40 5 discriminator 1 view .LVU223
+  38:Core/Src/main.c **** 
+ 892              		.loc 1 38 11 discriminator 1 view .LVU224
+ 893 0006 FEE7     		b	.L57
+ 894              		.cfi_endproc
+ 895              	.LFE46:
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 27
+
+
+ 897              		.text
+ 898              	.Letext0:
+ 899              		.file 3 "c:\\users\\jesse arendse\\appdata\\roaming\\code\\user\\globalstorage\\bmd.stm32-for-vsco
+ 900              		.file 4 "c:\\users\\jesse arendse\\appdata\\roaming\\code\\user\\globalstorage\\bmd.stm32-for-vsco
+ 901              		.file 5 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f051x8.h"
+ARM GAS  C:\Temp\ccdjtkHb.s 			page 28
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+  C:\Temp\ccdjtkHb.s:19     .text.delay:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:25     .text.delay:0000000000000000 delay
+  C:\Temp\ccdjtkHb.s:78     .text.pulse_strobe:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:84     .text.pulse_strobe:0000000000000000 pulse_strobe
+  C:\Temp\ccdjtkHb.s:137    .text.pulse_strobe:0000000000000034 $d
+  C:\Temp\ccdjtkHb.s:142    .text.lcd_putchar:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:148    .text.lcd_putchar:0000000000000000 lcd_putchar
+  C:\Temp\ccdjtkHb.s:394    .text.lcd_putchar:000000000000011c $d
+  C:\Temp\ccdjtkHb.s:400    .text.lcd_putstring:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:406    .text.lcd_putstring:0000000000000000 lcd_putstring
+  C:\Temp\ccdjtkHb.s:457    .text.lcd_command:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:463    .text.lcd_command:0000000000000000 lcd_command
+  C:\Temp\ccdjtkHb.s:713    .text.lcd_command:0000000000000124 $d
+  C:\Temp\ccdjtkHb.s:720    .text.init_LCD:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:726    .text.init_LCD:0000000000000000 init_LCD
+  C:\Temp\ccdjtkHb.s:819    .text.init_LCD:0000000000000070 $d
+  C:\Temp\ccdjtkHb.s:827    .rodata.helloWorld.str1.4:0000000000000000 $d
+  C:\Temp\ccdjtkHb.s:831    .text.helloWorld:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:837    .text.helloWorld:0000000000000000 helloWorld
+  C:\Temp\ccdjtkHb.s:864    .text.helloWorld:0000000000000014 $d
+  C:\Temp\ccdjtkHb.s:869    .text.main:0000000000000000 $t
+  C:\Temp\ccdjtkHb.s:875    .text.main:0000000000000000 main
+
+NO UNDEFINED SYMBOLS
