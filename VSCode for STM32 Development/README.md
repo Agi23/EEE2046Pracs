@@ -1,6 +1,9 @@
 # VSCode for STM32 Development
 Prerequisite: VSCode installation + STM32 update and demo
 
+# Method 1
+Video guide availible at: https://clipchamp.com/watch/EiouQ4LPKin
+        
 ## Get stm32-for-vscode extension
 Navigate to the Extensions tab in VScode and install the stm32-for-vscode extension
 <img width="552" alt="stm32Extension" src="https://user-images.githubusercontent.com/15980541/231163351-1b747808-ca5e-4e39-8222-affb2877c4e8.PNG">
@@ -19,5 +22,8 @@ Navigate to the Extensions tab in VScode and install the stm32-for-vscode extens
 3. After building, you can flash this code to your board by selecting "Flash STM32"
 4. You should see "Hello World! :)" onto your LCD screen.
 
+# Method 2 (not as lightweight, but more reliable)
+Video guide availible at: https://clipchamp.com/watch/1dblbRnocat
+#
 
 You are now ready to start programming your board with your own code :) 
