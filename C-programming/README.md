@@ -1,7 +1,8 @@
 # EEE2046Pracs
 
 ## Windows C Setup
-This tutorial is based on the video: https://youtu.be/oaebkkOP2Qg
+1. This tutorial is based on the video: https://youtu.be/oaebkkOP2Qg
+2. Video Guide for setting up VS Code for C-Programming: https://clipchamp.com/watch/WZsdb849MVL
 
 ### Download and extract MinGW
 1. Download MinGW: https://nuwen.net/files/mingw/mingw-18.0-without-git.exe
